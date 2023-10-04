@@ -1,0 +1,93 @@
+<table class="table table-striped justify-content-center align-items-center">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% users.forEach(user => { %>
+            <tr id="user<%= user.id%>">
+                <td><input name="FirstName<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.LastName %>" aria-label="Disabled input example" disabled readonly></td>
+                <td><input name="LastName<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.FirstName %>" aria-label="Disabled input example" disabled readonly></td>
+                <td><input name="Email<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.Email %>" aria-label="Disabled input example" disabled readonly></td>
+                <td>
+                    <!-- Lien pour éditer l'utilisateur -->
+                    <button data-ligne-id="user<%= user.id%>"  class="btn btn-primary editBtn">Éditer</a>
+                    <!-- Formulaire pour supprimer l'utilisateur -->
+                    <form action="/users/<%= user.id %>" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
+                        <input type="hidden" name="_method" value="DELETE" />
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<script>
+    // Sélectionnez tous les boutons d'édition
+// Sélectionnez tous les boutons d'édition
+const editBtns = document.querySelectorAll('.editBtn');
+
+// Ajoutez un écouteur d'événement à chaque bouton
+editBtns.forEach(btn => {
+  btn.addEventListener('click', (event) => {
+    const ligneId = event.target.getAttribute('data-ligne-id');
+    const inputs = document.querySelectorAll(`#${ligneId} input`);
+    // Si le bouton est en mode édition
+    console.log("Event bouton");
+    if (event.target.textContent.trim() === 'Éditer') {
+      event.target.textContent = 'Sauvegarder';
+      inputs.forEach(input => {
+        input.disabled = false;
+        input.readOnly = false;
+      });
+    } else if (event.target.textContent.trim() === 'Sauvegarder') {
+      event.target.textContent = 'Éditer';
+      inputs.forEach(input => {
+        input.disabled = true;
+        input.readOnly = true;
+      });
+      // Appelez la fonction pour mettre à jour l'utilisateur
+      // Assurez-vous d'obtenir les nouvelles valeurs des champs de saisie
+      const userId = ligneId.replace('user', ''); // supposant que l'ID de l'utilisateur est le même que le numéro de ligne
+      const newData = {
+        input1: document.getElementsByName(`FirstName${userId}`).value,
+        input2: document.getElementsByName(`LastName${userId}`).value,
+        input3: document.getElementsByName(`Email${userId}`).value
+      };
+      console.log(userId);
+      updateUser(userId, newData);
+    }
+  });
+});
+
+function updateUser(userId, newData) {
+  // Mettez ici votre logique pour appeler la route PUT
+  fetch(`/users/${userId}`, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(newData)
+})
+.then(response => {
+  if (response.ok) {
+    return response.json();
+  } else {
+    return Promise.reject(`Status: ${response.status}, Text: ${response.statusText}`);
+  }
+})
+.then(data => {
+  console.log('Success:', data);
+})
+.catch((error) => {
+  console.error('Error:', error);
+});
+}
+
+
+
+</script>
