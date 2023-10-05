@@ -29,8 +29,7 @@ app.get('/users', userController.getAllUsers);
 app.get('/users/:id', userController.getUserById);
 app.put('/users/:id', (req, res) => {
     try {
-      
-      userController.updateUser
+      userController.updateUser(req, res);
     } catch (error) {
       res.status(500).json({ error: error.message }); // Réponse d'erreur
     }

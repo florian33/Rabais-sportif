@@ -54,11 +54,11 @@ editBtns.forEach(btn => {
       // Assurez-vous d'obtenir les nouvelles valeurs des champs de saisie
       const userId = ligneId.replace('user', ''); // supposant que l'ID de l'utilisateur est le même que le numéro de ligne
       const newData = {
-        input1: document.getElementsByName(`FirstName${userId}`).value,
-        input2: document.getElementsByName(`LastName${userId}`).value,
-        input3: document.getElementsByName(`Email${userId}`).value
+        input1: document.getElementsByName('FirstName'+userId)[0].value,
+        input2: document.getElementsByName('LastName' +userId)[0].value,
+        input3: document.getElementsByName('Email' +userId)[0].value
       };
-      console.log(userId);
+
       updateUser(userId, newData);
     }
   });
@@ -66,7 +66,9 @@ editBtns.forEach(btn => {
 
 function updateUser(userId, newData) {
   // Mettez ici votre logique pour appeler la route PUT
-  fetch(`/users/${userId}`, {
+ 
+  debugger;
+  fetch('/users/'+userId, {
   method: 'PUT',
   headers: {
     'Content-Type': 'application/json'

@@ -56,6 +56,7 @@ module.exports = {
     },
 
     async updateUser(req, res) {
+       console.log("variable req " + req);
         try {
             await User.update(req.body, {
                 where: {
