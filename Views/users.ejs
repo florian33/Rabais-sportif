@@ -1,31 +1,39 @@
-<table class="table table-striped justify-content-center align-items-center">
-    <thead>
-        <tr>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Email</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% users.forEach(user => { %>
-            <tr id="user<%= user.id%>">
-                <td><input name="FirstName<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.LastName %>" aria-label="Disabled input example" disabled readonly></td>
-                <td><input name="LastName<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.FirstName %>" aria-label="Disabled input example" disabled readonly></td>
-                <td><input name="Email<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.Email %>" aria-label="Disabled input example" disabled readonly></td>
-                <td>
-                    <!-- Lien pour éditer l'utilisateur -->
-                    <button data-ligne-id="user<%= user.id%>"  class="btn btn-primary editBtn">Éditer</a>
-                    <!-- Formulaire pour supprimer l'utilisateur -->
-                    <form action="/users/<%= user.id %>" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
-                        <input type="hidden" name="_method" value="DELETE" />
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-        <% }) %>
-    </tbody>
-</table>
+
+
+  <table class="table table-striped justify-content-center align-items-center">
+      <thead>
+          <tr>
+              <th>Prénom</th>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Actions</th>
+          </tr>
+      </thead>
+      <tbody>
+          <% users.forEach(user => { %>
+              <tr id="user<%= user.id%>">
+                  <td><input name="FirstName<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.FirstName %>" aria-label="Disabled input example" disabled readonly></td>
+                  <td><input name="LastName<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.LastName %>" aria-label="Disabled input example" disabled readonly></td>
+                  <td><input name="Email<%= user.id%>" class="form-control user<%= user.id%>" type="text" value="<%= user.Email %>" aria-label="Disabled input example" disabled readonly></td>
+                  <td>
+                      <!-- Lien pour éditer l'utilisateur -->
+                      <button data-ligne-id="user<%= user.id%>"  class="btn btn-primary editBtn">Éditer</a>
+                      <!-- Formulaire pour supprimer l'utilisateur -->
+                      <form action="/users/<%= user.id %>" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
+                          <input type="hidden" name="_method" value="DELETE" />
+                          <button type="submit" class="btn btn-danger">Supprimer</button>
+                      </form>
+                  </td>
+              </tr>
+          <% }) %>
+      </tbody>
+  </table>
+
+
+
+
+  
+
 <script>
     // Sélectionnez tous les boutons d'édition
 // Sélectionnez tous les boutons d'édition
@@ -54,9 +62,10 @@ editBtns.forEach(btn => {
       // Assurez-vous d'obtenir les nouvelles valeurs des champs de saisie
       const userId = ligneId.replace('user', ''); // supposant que l'ID de l'utilisateur est le même que le numéro de ligne
       const newData = {
-        input1: document.getElementsByName('FirstName'+userId)[0].value,
-        input2: document.getElementsByName('LastName' +userId)[0].value,
-        input3: document.getElementsByName('Email' +userId)[0].value
+        id: userId,
+        FirstName: document.getElementsByName('FirstName'+userId)[0].value,
+        LastName: document.getElementsByName('LastName' +userId)[0].value,
+        Email: document.getElementsByName('Email' +userId)[0].value
       };
 
       updateUser(userId, newData);
@@ -67,7 +76,6 @@ editBtns.forEach(btn => {
 function updateUser(userId, newData) {
   // Mettez ici votre logique pour appeler la route PUT
  
-  debugger;
   fetch('/users/'+userId, {
   method: 'PUT',
   headers: {
@@ -76,20 +84,38 @@ function updateUser(userId, newData) {
   body: JSON.stringify(newData)
 })
 .then(response => {
-  if (response.ok) {
-    return response.json();
-  } else {
-    return Promise.reject(`Status: ${response.status}, Text: ${response.statusText}`);
+  return response.text();
+})
+.then(text => {
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return text;
   }
 })
 .then(data => {
-  console.log('Success:', data);
-})
-.catch((error) => {
-  console.error('Error:', error);
+  displayAlert(200,data);
+
+}).catch((error) => {
+  displayAlert(400,error);
 });
 }
 
+function displayAlert(code,data) {
+  let element = document.getElementById("TempAlert");
+  if(code == 200) { 
+      element.className = "d-flex justify-content-center align-items-center container mt-3 alert alert-success";
+  } else if (code == 400 ){
+      element.className = "d-flex justify-content-center align-items-center container mt-3 alert alert-error";
+  }
+  element.innerText = data;
+    // Supprimez l'alerte après 3 secondes
+    setTimeout(() => {
+        element.remove();
+    }, 5000);
+}
 
+
+    
 
 </script>

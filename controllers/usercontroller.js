@@ -56,13 +56,9 @@ module.exports = {
     },
 
     async updateUser(req, res) {
-       console.log("variable req " + req);
+       //console.info(req);
         try {
-            await User.update(req.body, {
-                where: {
-                    id: req.params.id
-                }
-            });
+            await User.updateUser(req.params.id, req.body);
             res.status(200).send("User updated successfully");
         } catch (error) {
             res.status(400).send(error.message);
