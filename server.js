@@ -24,7 +24,13 @@ app.listen(3030, () => {
     console.log('Server started on http://localhost:3030');
 });
 
-app.post('/users', userController.createUser);
+app.post('/users', (req, res) => {
+  try {
+    userController.createUser(req, res);
+  } catch (error) {
+    res.status(500).json({ error: error.message }); // Réponse d'erreur
+  }
+});
 app.get('/users', userController.getAllUsers);
 app.get('/users/:id', userController.getUserById);
 app.put('/users/:id', (req, res) => {

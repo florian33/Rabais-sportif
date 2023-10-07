@@ -33,7 +33,10 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="userDropdown">
                         <li><a class="dropdown-item active" href="/users">Voir utilisateurs</a></li>
-                        <li><a class="dropdown-item" href="/users/add">Ajouter un utilisateur</a></li>
+                        <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#userModal" href="#userModal">Ajouter un utilisateur</a></li>
+                        <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal">
+                            Ajouter un utilisateur
+                          </button> -->
                     </ul>
                 </li>
                 <!-- Fin sous-menu utilisateurs -->
@@ -64,7 +67,9 @@
             Espace pour la bannière du footer.
         </div>
     </div>
+    <!-- Modal -->
 
+  
     <!-- JS optionnel pour Bootstrap si nécessaire -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -5,24 +5,27 @@ const User = require('../services/userService');
 //console.log("Chargement du controller Usercontroller")
 module.exports = {
     async createUser(req, res) {
+        console.log("Dans CreateUser")
         const now = new Date();
+        console.info(req);
+        
         try {
             const data = req.body;
         // 1. Valider les données
-        if (!data.firstName || !data.lastName || !data.email) {
+        if (!data.FirstName || !data.LastName || !data.Email) {
             return res.status(400).send('Champs manquants ou invalides.');
         }
 
         // 2. Nettoyer les données (si nécessaire)
         // Par exemple, supprimer les espaces inutiles des noms et prénoms
-        data.firstName = data.firstName.trim();
-        data.lastName = data.lastName.trim();
+        data.FirstName = data.FirstName.trim();
+        data.LastName = data.LastName.trim();
         data.createdAt = now;
 
         // Vous pouvez également effectuer d'autres ajustements ici, selon vos besoins.
 
         // 3. Insérez les données
-        const user = await User.create(data);
+        const user = await User.createUser(data);
         res.status(201).send(user);
         } catch (error) {
             res.status(400).send(error.message);
@@ -67,11 +70,7 @@ module.exports = {
 
     async deleteUser(req, res) {
         try {
-            await User.destroy({
-                where: {
-                    id: req.params.id
-                }
-            });
+            await User.deleteUser(req.params.id);
             res.status(200).send("User deleted successfully");
         } catch (error) {
             res.status(400).send(error.message);

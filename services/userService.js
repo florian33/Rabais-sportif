@@ -4,7 +4,7 @@ const db = require('../models');
 
 exports.createUser = async function(data) {
     try {
-        return await User.create(data);
+        return await db.User.create(data);
     } catch (error) {
         console.error("Erreur lors de la création de l'utilisateur:", error);
         throw error;  // Vous pouvez choisir de relancer l'erreur ou de la gérer différemment.

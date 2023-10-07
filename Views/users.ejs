@@ -19,9 +19,9 @@
                       <!-- Lien pour éditer l'utilisateur -->
                       <button data-ligne-id="user<%= user.id%>"  class="btn btn-primary editBtn">Éditer</a>
                       <!-- Formulaire pour supprimer l'utilisateur -->
-                      <form action="/users/<%= user.id %>" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
+                      <form onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur?');">
                           <input type="hidden" name="_method" value="DELETE" />
-                          <button type="submit" class="btn btn-danger">Supprimer</button>
+                          <button data-ligne-id="user<%= user.id%>" class="btn btn-danger delBtn">Supprimer</button>
                       </form>
                   </td>
               </tr>
@@ -29,16 +29,108 @@
       </tbody>
   </table>
 
+  <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userModalLabel">Créer un utilisateur</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Formulaire de création d'utilisateur -->
+          <form id="userCreationForm">
+            <div class="mb-3">
+              <label for="FirstName" class="form-label">Prénom</label>
+              <input type="text" class="form-control" id="FirstName" name="FirstName">
+            </div>
+            <div class="mb-3">
+                <label for="Lastname" class="form-label">Nom de famille</label>
+                <input type="text" class="form-control" id="LastName" name="LastName">
+              </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Courriel</label>
+              <input type="email" class="form-control" id="Email" name="email">
+            </div>
+            <!-- Vous pouvez ajouter d'autres champs ici selon vos besoins -->
+            <button type="button" id="submitUser" class="btn btn-primary">Créer</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 
 
   
 
 <script>
-    // Sélectionnez tous les boutons d'édition
+// Sélectionnez tous les boutons d'édition
+const delBtns = document.querySelectorAll('.delBtn');
+// Ajoutez un écouteur d'événement à chaque bouton
+delBtns.forEach(btn => {
+  btn.addEventListener('click', (event) => {
+    const ligneId = event.target.getAttribute('data-ligne-id');
+
+      const userId = ligneId.replace('user', ''); // supposant que l'ID de l'utilisateur est le même que le numéro de ligne
+      const newData = {
+        id: userId      
+      };
+
+      deleteUser(userId);
+    })
+});
+
+
+
+document.getElementById("submitUser").addEventListener("click", function() {
+    // Récupération des valeurs du formulaire
+    const FirstName = document.getElementById("FirstName").value;
+    const Lastname = document.getElementById("LastName").value;
+    const email = document.getElementById("Email").value;
+
+    // Création de l'objet data à envoyer
+    const data = {
+        FirstName: FirstName,
+        LastName: Lastname,
+        Email: email
+    };
+    // Envoi de la requête au serveur avec fetch
+    fetch('/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        
+        // Si vous voulez fermer le modal après la réussite de la création
+        var bootstrapModal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+        document.getElementById("FirstName").value = "";
+        document.getElementById("LastName").value = "";
+        document.getElementById("Email").value = "";
+        bootstrapModal.hide();
+        // Si vous souhaitez afficher un message de succès à l'utilisateur, c'est ici.
+        window.location.reload();
+        
+        displayAlert(200,data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        // Si vous souhaitez afficher un message d'erreur à l'utilisateur, c'est ici.
+    });
+});
+
+
+
 // Sélectionnez tous les boutons d'édition
 const editBtns = document.querySelectorAll('.editBtn');
-
 // Ajoutez un écouteur d'événement à chaque bouton
 editBtns.forEach(btn => {
   btn.addEventListener('click', (event) => {
@@ -72,6 +164,33 @@ editBtns.forEach(btn => {
     }
   });
 });
+
+function deleteUser(userId) {
+  // Mettez ici votre logique pour appeler la route PUT
+ 
+  fetch('/users/'+userId, {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+})
+.then(response => {
+  return response.text();
+})
+.then(text => {
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return text;
+  }
+})
+.then(data => {
+  displayAlert(200,data);
+
+}).catch((error) => {
+  displayAlert(400,error);
+});
+}
 
 function updateUser(userId, newData) {
   // Mettez ici votre logique pour appeler la route PUT
@@ -109,7 +228,7 @@ function displayAlert(code,data) {
       element.className = "d-flex justify-content-center align-items-center container mt-3 alert alert-error";
   }
   element.innerText = data;
-    // Supprimez l'alerte après 3 secondes
+    // Supprimez l'alerte après 5 secondes
     setTimeout(() => {
         element.remove();
     }, 5000);
